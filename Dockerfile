@@ -7,6 +7,9 @@ USER vscode
 # Avoid warnings by temporarily switching to non-interactive mode.
 ARG DEBIAN_FRONTEND=noninteractive
 
+# Node.js major-version to be installed.
+ARG NODE_VERSION=12
+
 # Define the GitHub fingerprint to add to known hosts.
 # https://help.github.com/en/github/authenticating-to-github/githubs-ssh-key-fingerprints
 ARG GITHUB_FINGERPRINT=SHA256:nThbg6kXUpJWGl7E1IGOCspRomTxdCARLviKw6E5SY8
@@ -17,24 +20,22 @@ RUN sudo apt-get update \
   && sudo apt-get install -y software-properties-common \
   # Add Git-Core PPA, which provides the latest Git version.
   && sudo apt-add-repository ppa:git-core/ppa \
+  # Add Node.js repository.
+  && curl -sL https://deb.nodesource.com/setup_${NODE_VERSION}.x | sudo bash - \
   # Install packages.
   && sudo apt-get install -y \
+  nodejs \
   git \
   build-essential \
   # Clean up packages.
   && sudo apt-get autoremove -y \
   && sudo apt-get clean -y \
   && sudo rm -rf /var/lib/apt/lists/* \
+  # Install the latest version of NPM.
+  && sudo npm install -g npm \
   # Create the workspace directory for VS Code.
   && sudo mkdir -p /workspace \
   && sudo chown -R $(id -u) /workspace \
-  # Install NVM.
-  && curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/master/install.sh | bash - \
-  && export NVM_DIR="$HOME/.nvm" \
-  && [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" \
-  && [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion" \
-  # Install the latest Node.js and NPM versions.
-  && nvm install --lts --latest-npm \
   # Create the folder for storing vs-code extensions.
   && mkdir -p ~/.vscode-server/extensions \
   && mkdir -p ~/.vscode-server-insiders \
