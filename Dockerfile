@@ -4,9 +4,6 @@ FROM mcr.microsoft.com/vscode/devcontainers/base:ubuntu-18.04
 # Use the default non-root user from the base image.
 USER vscode
 
-# Avoid warnings by temporarily switching to non-interactive mode.
-ARG DEBIAN_FRONTEND=noninteractive
-
 # Node.js major-version to be installed.
 ARG NODE_VERSION=12
 
@@ -14,8 +11,10 @@ ARG NODE_VERSION=12
 # https://help.github.com/en/github/authenticating-to-github/githubs-ssh-key-fingerprints
 ARG GITHUB_FINGERPRINT=SHA256:nThbg6kXUpJWGl7E1IGOCspRomTxdCARLviKw6E5SY8
 
-# Update packages lists.
-RUN sudo apt-get update \
+# Avoid warnings by temporarily switching to non-interactive mode.
+RUN export DEBIAN_FRONTEND=noninteractive \
+  # Update packages lists.
+  && sudo apt-get update \
   # Install software-properties-common to be able to add PPA in Ubuntu.
   && sudo apt-get install -y software-properties-common \
   # Add Git-Core PPA, which provides the latest Git version.
